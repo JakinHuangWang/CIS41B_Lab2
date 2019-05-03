@@ -43,12 +43,12 @@ def roomAndBoardTrend(c):
 #@retVal
 def fourYearPaths(c, yrNum):
     npArr = c.getArr()
-    grad_Yr = yrNum - 1970
+    grad_Yr = yrNum - c.getStart_year() + 1
     private4yr_Cost = np.sum(npArr[grad_Yr-4:grad_Yr, 0])
     public4yr_Cost = np.sum(npArr[grad_Yr-4:grad_Yr, 2])
     ccprivate4yr_Cost = np.sum(npArr[grad_Yr-4:grad_Yr-2, 4]+npArr[grad_Yr-2:grad_Yr, 0])
     ccpublic4yr_Cost = np.sum(npArr[grad_Yr-4:grad_Yr-2, 4]+npArr[grad_Yr-2:grad_Yr, 2])
-    plt.bar(tuple(range(1, 5)), (private4yr_Cost, public4yr_Cost, ccprivate4yr_Cost, ccpublic4yr_Cost))
+    plt.bar((1,2,3,4), (private4yr_Cost, public4yr_Cost, ccprivate4yr_Cost, ccpublic4yr_Cost), align="center")
     label = ['Private 4-Yr\n' + str(private4yr_Cost), 
              'Public 4-Yr\n' + str(public4yr_Cost), 
              'CC to Private 4-yr\n' + str(ccprivate4yr_Cost), 
@@ -56,7 +56,7 @@ def fourYearPaths(c, yrNum):
     plt.title('4 Pathways Trend(Graduation Year: ' + str(grad_Yr + 1970) + ')' )
     plt.xlabel('Years')
     plt.ylabel('4 Pathways')
-    plt.xticks(np.arange(1, 5), label, fontsize = 8)
+    plt.xticks((1,2,3,4), label, fontsize = 10)
     return private4yr_Cost, public4yr_Cost, ccprivate4yr_Cost, ccpublic4yr_Cost  
 
 def main():
@@ -101,6 +101,9 @@ class mainWindow(tk.Tk):
 class plotWindow(tk.Toplevel):
     def __init__(self, master):
         super().__init__(master)
+        self.grab_set()
+        self.focus_set()
+        self.transient(master)
         self.title("Plotting Window")
     def graph(self, someFunc):
         fig = plt.figure()
@@ -120,6 +123,7 @@ class dialogueWindow(tk.Toplevel):
         self.userInput = 0
         self.grab_set()
         self.focus_set()        
+        self.transient(master)
         self.entryText = tk.StringVar()
         self.title("Dialogue Window")
         tk.Label(self, text="Enter year of graduation or click and press Enter for latest year: ").grid(row=0,column=0)
@@ -137,7 +141,6 @@ class dialogueWindow(tk.Toplevel):
         return self.userInput
     def badInput(self):
         eWin = errorWindow(self)
-        self.wait_window(eWin)
     #def retYr(self):
         #return self.userInput
 class errorWindow(tk.Toplevel):
