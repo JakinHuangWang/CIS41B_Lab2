@@ -19,7 +19,6 @@ def tuitionTrend(c):
     plt.xlabel('Years')
     plt.ylabel('Tuition')
     plt.legend(loc='best')
-    plt.show()
     
 def roomAndBoardTrend(c):
     npArr = c.getArr()
@@ -31,7 +30,6 @@ def roomAndBoardTrend(c):
     plt.xlabel('Years')
     plt.ylabel('Room + Board')
     plt.legend(loc='best')
-    plt.show()
     
 ##Function retVal(someFunc) is a decorator for the function popDensity()
 #def retVal(someFunc):
@@ -59,7 +57,6 @@ def fourYearPaths(c, yrNum):
     plt.xlabel('Years')
     plt.ylabel('4 Pathways')
     plt.xticks(np.arange(1, 5), label, fontsize = 8)
-    plt.show()
     return private4yr_Cost, public4yr_Cost, ccprivate4yr_Cost, ccpublic4yr_Cost  
 
 # Additional code for running GUI application on Mac
@@ -82,44 +79,87 @@ def main():
     roomAndBoardTrend(c)
     fourYearPaths(c)
 #main()   
-win = tk.Tk()
-def FourYearThing():
-    topWin = tk.Toplevel(win)
+def FourYearThing(c):
     userEntry = tk.StringVar()
     tk.Label(topWin, text="Enter year of graduation or click and press Enter for latest year: ").grid(row=0,column=0)
     userEntry = tk.Entry(topWin, textvariable=userEntry)
     userEntry.grid(row=0, column=1)
     userEntry.bind('<Return>', lambda event:innerFourYrThing(topWin, userEntry))
-    topWin.mainloop()
     
-def innerFourYrThing(topWin, userEntry):
-    entryText = userEntry.get()
-    print(type(entryText))
-    userEntry.delete(0, tk.END)
-    if not entryText.isdigit():
-        atopWin = tk.Toplevel(topWin)
-        tk.Label(atopWin, text = "You didn't input a number!! Please input again").grid()
-        atopWin.mainloop()      
-    elif len(entryText) == 0:
-        entryText = str(College().getEnd_year())
-    elif int(entryText) < College().getStart_year() or int(entryText) > College().getEnd_year():
-        atopWin = tk.Toplevel(topWin)
-        tk.Label(atopWin, text = "Year not within range!! Please input again").grid()
-        atopWin.mainloop()      
-    else:
-        print(fourYearPaths(College(), int(entryText)))
+#def innerFourYrThing(topWin, userEntry):
+    #entryText = userEntry.get()
+    #userEntry.delete(0, tk.END)
+    #if not entryText.isdigit():
+        #atopWin = tk.Toplevel(topWin)
+        #tk.Label(atopWin, text = "You didn't input a number!! Please input again").grid()
+        #atopWin.mainloop()      
+    #elif len(entryText) == 0:
+        #entryText = str(College().getEnd_year())
+    #elif int(entryText) < College().getStart_year() or int(entryText) > College().getEnd_year():
+        #atopWin = tk.Toplevel(topWin)
+        #tk.Label(atopWin, text = "Year not within range!! Please input again").grid()
+        #atopWin.mainloop()      
+    #else:
+        #print(fourYearPaths(College(), int(entryText)))
     #s = tk.StringVar()
     #s.set(userEntry)
     #tk.Label(atopWin, textvariable=s).grid()
-    
-    
-win.title('College Pricing')
-win.configure(bg='blue')
-win.geometry("500x100")
-TuitionB = tk.Button(text='Tuition Trend', width=10, command=lambda:tuitionTrend(College()))
-TuitionB.grid(row=0, column=0, padx=10, pady=10)
-RoomBoardB = tk.Button(text='Room And Board', width=20, command = lambda:roomAndBoardTrend(College()))
-RoomBoardB.grid(row=0, column=1, padx=10, pady=10)
-FourYrB = tk.Button(text='4 Year Trend', width=10, command=FourYearThing)
-FourYrB.grid(row = 0, column=2, padx=10, pady=10)
+
+class mainWindow(tk.Tk):
+    def __init__(self):
+        super().__init__()
+        self.title('College Pricing')
+        tk.Button(self, text='Tuition Trend', width=10, command=lambda:plotWindow(self).graph(tuitionTrend)).grid(row=0, column=0, padx=10, pady=10)
+        tk.Button(self, text='Room And Board', width=20, command=lambda:plotWindow(self).graph(roomAndBoardTrend)).grid(row=0, column=1, padx=10, pady=10)
+        tk.Button(self, text='4 Year Trend', width=10, command=lambda:dialogueWindow(self)).grid(row = 0, column=2, padx=10, pady=10)
+class plotWindow(tk.Toplevel):
+    def __init__(self, master):
+        super().__init__(master)
+        self.title("Plotting Window")
+    def graph(self, someFunc):
+        fig = plt.figure()
+        someFunc(College())
+        canvas = FigureCanvasTkAgg(fig, master=self)      
+        canvas.get_tk_widget().grid()	               	
+        canvas.draw()
+    def anotherGraph(self, someFunc, yr):
+        fig = plt.figure()
+        someFunc(College(), yr)
+        canvas = FigureCanvasTkAgg(fig, master=self)      
+        canvas.get_tk_widget().grid()	               	
+        canvas.draw()
+        
+class dialogueWindow(tk.Toplevel):
+    def __init__(self, master):
+        super().__init__(master)
+        self.userInput = 0
+        self.grab_set()
+        self.focus_set()        
+        self.entryText = tk.StringVar()
+        self.title("Dialogue Window")
+        tk.Label(self, text="Enter year of graduation or click and press Enter for latest year: ").grid(row=0,column=0)
+        self.userEntry = tk.Entry(self, textvariable=self.entryText)
+        self.userEntry.grid(row=0, column=1)
+        self.userEntry.bind("<Return>", self.getEntry)
+    def getEntry(self, event):
+        self.userInput = self.userEntry.get()
+        self.userEntry.delete(0, tk.END)
+        if not self.userInput.isdigit() or int(self.userInput) < 1971 or int(self.userInput) > 2018:
+            self.badInput()
+        else:
+            plotWindow(self).anotherGraph(fourYearPaths, int(self.userInput))
+    def retVal(self):
+        return self.userInput
+    def badInput(self):
+        eWin = errorWindow(self)
+        self.wait_window(eWin)
+    #def retYr(self):
+        #return self.userInput
+class errorWindow(tk.Toplevel):
+    def __init__(self, master):
+        super().__init__(master)
+        self.grab_set()
+        self.focus_set()        
+        tk.Label(self, text = "Year must be 4 digit between 1971 and 2018").grid()             
+win = mainWindow()
 win.mainloop()
