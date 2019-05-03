@@ -89,18 +89,29 @@ def FourYearThing():
     tk.Label(topWin, text="Enter year of graduation or click and press Enter for latest year: ").grid(row=0,column=0)
     userEntry = tk.Entry(topWin, textvariable=userEntry)
     userEntry.grid(row=0, column=1)
-    userEntry.bind('<Return>', lambda event:innerFourYrThing(topWin, userEntry.get()))
+    userEntry.bind('<Return>', lambda event:innerFourYrThing(topWin, userEntry))
     topWin.mainloop()
     
 def innerFourYrThing(topWin, userEntry):
-    atopWin = tk.Toplevel(topWin)
-    if len(userEntry) == 0:
-        userEntry = str(College().getEnd_year())
-    print(fourYearPaths(College(), int(userEntry)))
+    entryText = userEntry.get()
+    print(type(entryText))
+    userEntry.delete(0, tk.END)
+    if not entryText.isdigit():
+        atopWin = tk.Toplevel(topWin)
+        tk.Label(atopWin, text = "You didn't input a number!! Please input again").grid()
+        atopWin.mainloop()      
+    elif len(entryText) == 0:
+        entryText = str(College().getEnd_year())
+    elif int(entryText) < College().getStart_year() or int(entryText) > College().getEnd_year():
+        atopWin = tk.Toplevel(topWin)
+        tk.Label(atopWin, text = "Year not within range!! Please input again").grid()
+        atopWin.mainloop()      
+    else:
+        print(fourYearPaths(College(), int(entryText)))
     #s = tk.StringVar()
     #s.set(userEntry)
     #tk.Label(atopWin, textvariable=s).grid()
-    atopWin.mainloop()
+    
     
 win.title('College Pricing')
 win.configure(bg='blue')
@@ -109,6 +120,6 @@ TuitionB = tk.Button(text='Tuition Trend', width=10, command=lambda:tuitionTrend
 TuitionB.grid(row=0, column=0, padx=10, pady=10)
 RoomBoardB = tk.Button(text='Room And Board', width=20, command = lambda:roomAndBoardTrend(College()))
 RoomBoardB.grid(row=0, column=1, padx=10, pady=10)
-FourYrB = tk.Button(text='4 Year Trend', width=10, command = FourYearThing)
+FourYrB = tk.Button(text='4 Year Trend', width=10, command=FourYearThing)
 FourYrB.grid(row = 0, column=2, padx=10, pady=10)
 win.mainloop()
