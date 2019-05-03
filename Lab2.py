@@ -10,10 +10,10 @@ import matplotlib.pyplot as plt	                # normal import of pyplot to plo
 def tuitionTrend(c):
     npArr = c.getArr()
     size = len(npArr)
-    colorLabelDict = {'.-g':'Private 4-year', '.-b':'Public 4-year', '.-r':'Public 2-year'}
-    plt.plot(np.arange(c.getStart_year(), c.getEnd_year() + 1), npArr[:size//2, 0], '.-g', label = 'Private 4-year')
-    plt.plot(np.arange(c.getStart_year(), c.getEnd_year() + 1), npArr[:size//2, 2], '.-b', label = 'Public 4-year')
-    plt.plot(np.arange(c.getStart_year(), c.getEnd_year() + 1), npArr[:size//2, 4], '.-r', label = 'Public 2-year')
+    colorLabelLst = [('.-g', 'Private 4-year'), ('.-b', 'Public 4-year'), ('.-r','Public 2-year')]
+    for i in range(len(colorLabelLst)):
+        plt.plot(np.arange(c.getStart_year(), c.getEnd_year() + 1), npArr[:size//2, i*2], colorLabelLst[i][0], 
+                 label=colorLabelLst[i][1])
     plt.xticks(np.arange(c.getStart_year(), c.getEnd_year() + 1), rotation = 90, fontsize = 8)
     plt.title('Tuition Trend')
     plt.xlabel('Years')
@@ -58,20 +58,6 @@ def fourYearPaths(c, yrNum):
     plt.ylabel('4 Pathways')
     plt.xticks(np.arange(1, 5), label, fontsize = 8)
     return private4yr_Cost, public4yr_Cost, ccprivate4yr_Cost, ccpublic4yr_Cost  
-
-# Additional code for running GUI application on Mac
-
-# these modules and the code below will be covered in module 4
-import sys
-import os
-
-def gui2fg():
-    """Brings tkinter GUI to foreground on Mac
-       Call gui2fg() after creating main window and before mainloop() start
-    """
-    if sys.platform == 'darwin':  
-        tmpl = 'tell application "System Events" to set frontmost of every process whose unix id is %d to true'
-        os.system("/usr/bin/osascript -e '%s'" % (tmpl % os.getpid()))
 
 def main():
     c = College()
@@ -127,8 +113,7 @@ class plotWindow(tk.Toplevel):
         someFunc(College(), yr)
         canvas = FigureCanvasTkAgg(fig, master=self)      
         canvas.get_tk_widget().grid()	               	
-        canvas.draw()
-        
+        canvas.draw()       
 class dialogueWindow(tk.Toplevel):
     def __init__(self, master):
         super().__init__(master)
@@ -161,5 +146,4 @@ class errorWindow(tk.Toplevel):
         self.grab_set()
         self.focus_set()        
         tk.Label(self, text = "Year must be 4 digit between 1971 and 2018").grid()             
-win = mainWindow()
-win.mainloop()
+mainWindow().mainloop()
