@@ -1,5 +1,14 @@
+"""
+LAB 2
+Author: Jakin Wang
+OS: Mac OSX
+IDE: Wings IDE
+Date: 05/04/2019
+"""
 import numpy as np
 import csv
+
+#class College includes: default filename, start_year, end_year, a numpy Array and all the accessor methods
 class College:
     filename = 'tuition.csv'
     start_year = 1971
@@ -17,5 +26,3 @@ class College:
         return self.end_year
     def getArr(self):
         return self.npArr
-            
-        
